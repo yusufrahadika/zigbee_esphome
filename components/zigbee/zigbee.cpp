@@ -334,7 +334,7 @@ void ZigBeeComponent::esp_zb_task() {
   ESP_ERROR_CHECK(esp_zb_set_primary_network_channel_set(ESP_ZB_PRIMARY_CHANNEL_MASK));
   ESP_ERROR_CHECK(esp_zb_start(false));
 
-  esp_zb_main_loop_iteration();
+  esp_zb_stack_main_loop();
 }
 
 void ZigBeeComponent::setup() {
