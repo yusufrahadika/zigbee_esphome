@@ -84,226 +84,189 @@ esp_err_t esphome_zb_cluster_add_or_update_attr(uint16_t cluster_id, esp_zb_attr
 
 esp_err_t esphome_zb_cluster_list_add_or_update_cluster(uint16_t cluster_id, esp_zb_cluster_list_t *cluster_list,
                                                         esp_zb_attribute_list_t *attr_list, uint8_t role_mask) {
-  esp_err_t ret;
+  esp_err_t ret = esp_zb_cluster_list_update_cluster(cluster_list, attr_list, cluster_id, role_mask);
   switch (cluster_id) {
     case ESP_ZB_ZCL_CLUSTER_ID_BASIC:
-      ret = esp_zb_cluster_list_update_basic_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_basic_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_POWER_CONFIG:
-      ret = esp_zb_cluster_list_update_power_config_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_power_config_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_IDENTIFY:
-      ret = esp_zb_cluster_list_update_identify_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_identify_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_GROUPS:
-      ret = esp_zb_cluster_list_update_groups_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_groups_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_SCENES:
-      ret = esp_zb_cluster_list_update_scenes_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_scenes_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_ON_OFF:
-      ret = esp_zb_cluster_list_update_on_off_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_on_off_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG:
-      ret = esp_zb_cluster_list_update_on_off_switch_config_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_on_off_switch_config_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL:
-      ret = esp_zb_cluster_list_update_level_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_level_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_TIME:
-      ret = esp_zb_cluster_list_update_time_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_time_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_ANALOG_INPUT:
-      ret = esp_zb_cluster_list_update_analog_input_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_analog_input_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_ANALOG_OUTPUT:
-      ret = esp_zb_cluster_list_update_analog_output_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_analog_output_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_ANALOG_VALUE:
-      ret = esp_zb_cluster_list_update_analog_value_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_analog_value_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_BINARY_INPUT:
-      ret = esp_zb_cluster_list_update_binary_input_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_binary_input_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_MULTI_VALUE:
-      ret = esp_zb_cluster_list_update_multistate_value_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_multistate_value_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_OTA_UPGRADE:
-      ret = esp_zb_cluster_list_update_ota_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_ota_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_SHADE_CONFIG:
-      ret = esp_zb_cluster_list_update_shade_config_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_shade_config_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_DOOR_LOCK:
-      ret = esp_zb_cluster_list_update_door_lock_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_door_lock_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_WINDOW_COVERING:
-      ret = esp_zb_cluster_list_update_window_covering_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_window_covering_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_THERMOSTAT:
-      ret = esp_zb_cluster_list_update_thermostat_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_thermostat_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_FAN_CONTROL:
-      ret = esp_zb_cluster_list_update_fan_control_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_fan_control_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_THERMOSTAT_UI_CONFIG:
-      ret = esp_zb_cluster_list_update_thermostat_ui_config_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_thermostat_ui_config_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_COLOR_CONTROL:
-      ret = esp_zb_cluster_list_update_color_control_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_color_control_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_ILLUMINANCE_MEASUREMENT:
-      ret = esp_zb_cluster_list_update_illuminance_meas_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_illuminance_meas_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_TEMP_MEASUREMENT:
-      ret = esp_zb_cluster_list_update_temperature_meas_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_temperature_meas_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_PRESSURE_MEASUREMENT:
-      ret = esp_zb_cluster_list_update_pressure_meas_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_pressure_meas_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_FLOW_MEASUREMENT:
-      ret = esp_zb_cluster_list_update_flow_meas_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_flow_meas_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_REL_HUMIDITY_MEASUREMENT:
-      ret = esp_zb_cluster_list_update_humidity_meas_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_humidity_meas_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING:
-      ret = esp_zb_cluster_list_update_occupancy_sensing_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_occupancy_sensing_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_CARBON_DIOXIDE_MEASUREMENT:
-      ret = esp_zb_cluster_list_update_carbon_dioxide_measurement_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_carbon_dioxide_measurement_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_PM2_5_MEASUREMENT:
-      ret = esp_zb_cluster_list_update_pm2_5_measurement_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_pm2_5_measurement_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_IAS_ZONE:
-      ret = esp_zb_cluster_list_update_ias_zone_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_ias_zone_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_PRICE:
-      ret = esp_zb_cluster_list_update_price_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_price_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_METERING:
-      ret = esp_zb_cluster_list_update_metering_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_metering_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_METER_IDENTIFICATION:
-      ret = esp_zb_cluster_list_update_meter_identification_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_meter_identification_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_ELECTRICAL_MEASUREMENT:
-      ret = esp_zb_cluster_list_update_electrical_meas_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_electrical_meas_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     case ESP_ZB_ZCL_CLUSTER_ID_DIAGNOSTICS:
-      ret = esp_zb_cluster_list_update_diagnostics_cluster(cluster_list, attr_list, role_mask);
       if (ret != ESP_OK) {
         ret = esp_zb_cluster_list_add_diagnostics_cluster(cluster_list, attr_list, role_mask);
       }
       break;
     default:
-      ret = ESP_FAIL;
   }
   return ret;
 }
@@ -323,7 +286,7 @@ esp_zb_attribute_list_t *esphome_zb_default_attr_list_create(uint16_t cluster_id
     case ESP_ZB_ZCL_CLUSTER_ID_ON_OFF:
       return esp_zb_on_off_cluster_create(NULL);
     case ESP_ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG:
-      return esp_zb_on_off_switch_cfg_cluster_create(NULL);
+      return esp_zb_on_off_switch_config_cluster_create(NULL);
     case ESP_ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL:
       return esp_zb_level_cluster_create(NULL);
     case ESP_ZB_ZCL_CLUSTER_ID_TIME:
@@ -373,7 +336,7 @@ esp_zb_attribute_list_t *esphome_zb_default_attr_list_create(uint16_t cluster_id
     case ESP_ZB_ZCL_CLUSTER_ID_IAS_ZONE:
       return esp_zb_ias_zone_cluster_create(NULL);
     case ESP_ZB_ZCL_CLUSTER_ID_PRICE:
-      return esp_zb_price_cluster_create();
+      return esp_zb_price_cluster_create(NULL);
     case ESP_ZB_ZCL_CLUSTER_ID_METERING:
       return esp_zb_metering_cluster_create(NULL);
     case ESP_ZB_ZCL_CLUSTER_ID_METER_IDENTIFICATION:
@@ -381,7 +344,7 @@ esp_zb_attribute_list_t *esphome_zb_default_attr_list_create(uint16_t cluster_id
     case ESP_ZB_ZCL_CLUSTER_ID_ELECTRICAL_MEASUREMENT:
       return esp_zb_electrical_meas_cluster_create(NULL);
     case ESP_ZB_ZCL_CLUSTER_ID_DIAGNOSTICS:
-      return esp_zb_diagnostics_cluster_create();
+      return esp_zb_diagnostics_cluster_create(NULL);
     default:
       return esp_zb_zcl_attr_list_create(cluster_id);
   }
