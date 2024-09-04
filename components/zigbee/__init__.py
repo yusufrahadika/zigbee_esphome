@@ -53,6 +53,7 @@ CONF_ROLE = "role"
 CONF_ENDPOINT = "endpoint"
 CONF_CLUSTER = "cluster"
 CONF_REPORT = "report"
+CONF_ROUTER = "router"
 
 zigbee_ns = cg.esphome_ns.namespace("zigbee")
 ZigBeeComponent = zigbee_ns.class_("ZigBeeComponent", cg.Component)
@@ -151,6 +152,7 @@ CONFIG_SCHEMA = cv.All(
                     cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(ZigBeeJoinTrigger),
                 }
             ),
+            cv.Optional(CONF_ROUTER, default=False): cv.boolean,
         }
     ).extend(cv.COMPONENT_SCHEMA),
     cv.require_framework_version(esp_idf=cv.Version(5, 1, 2)),
@@ -181,7 +183,10 @@ async def to_code(config):
     #            ref="4d68ccf0443770b40610892a1e598963d7fb154f",
     #        )
     add_idf_sdkconfig_option("CONFIG_ZB_ENABLED", True)
-    add_idf_sdkconfig_option("CONFIG_ZB_ZED", True)
+    if (config[CONF_POWER_SUPPLY] != 3 and config[CONF_ROUTER]):
+        add_idf_sdkconfig_option("CONFIG_ZB_ZCZR", True)
+    else:
+        add_idf_sdkconfig_option("CONFIG_ZB_ZED", True)
     add_idf_sdkconfig_option("CONFIG_ZB_RADIO_NATIVE", True)
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
