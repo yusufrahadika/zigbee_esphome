@@ -7,10 +7,6 @@
 #include "esphome/core/log.h"
 #include "zigbee_helpers.h"
 
-#if !defined ZB_ED_ROLE
-#error Define ZB_ED_ROLE in idf.py menuconfig to compile light (End Device) source code.
-#endif
-
 namespace esphome {
 namespace zigbee {
 
@@ -291,15 +287,16 @@ void ZigBeeComponent::create_endpoint(uint8_t endpoint_id, esp_zb_ha_standard_de
 
 void ZigBeeComponent::esp_zb_task() {
   /* initialize Zigbee stack */
-  esp_zb_zed_cfg_t zb_zed_cfg = {
-      .ed_timeout = ED_AGING_TIMEOUT,
-      .keep_alive = ED_KEEP_ALIVE,
-  };
-  esp_zb_cfg_t zb_nwk_cfg = {
-      .esp_zb_role = this->device_role,
-      .install_code_policy = INSTALLCODE_POLICY_ENABLE,
-  };
-  zb_nwk_cfg.nwk_cfg.zed_cfg = zb_zed_cfg;
+  esp_zb_cfg_t zb_nwk_cfg;
+#if defined(ZB_ED_ROLE)
+  zb_nwk_cfg = ESP_ZB_ZED_CONFIG();
+#pragma message("Compiling with Zigbee device role set to End Device (ZB_ED_ROLE).")
+#elif defined(CONFIG_ZB_ZCZR)
+  zb_nwk_cfg = ESP_ZB_ZR_CONFIG();
+#pragma message("Compiling with Zigbee device role set to Coordinator/Router (CONFIG_ZB_ZCZR).")
+#else
+#error "Define either ZB_ED_ROLE for End Device or CONFIG_ZB_ZCZR for Coordinator/Router."
+#endif
   esp_zb_init(&zb_nwk_cfg);
 
   // clusters

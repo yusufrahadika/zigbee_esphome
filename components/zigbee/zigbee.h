@@ -29,8 +29,36 @@ typedef struct zdo_info_ctx_s {
 #define INSTALLCODE_POLICY_ENABLE false /* enable the install code policy for security */
 #define ED_AGING_TIMEOUT ESP_ZB_ED_AGING_TIMEOUT_64MIN
 #define ED_KEEP_ALIVE 3000 /* 3000 millisecond */
+
+#define MAX_CHILDREN 10                     /* the max amount of connected devices */
+#define INSTALLCODE_POLICY_ENABLE false     /* enable the install code policy for security */
+#define HA_COLOR_DIMMABLE_LIGHT_ENDPOINT 10 /* esp light switch device endpoint */
+
 #define ESP_ZB_PRIMARY_CHANNEL_MASK \
   ESP_ZB_TRANSCEIVER_ALL_CHANNELS_MASK /* Zigbee primary channel mask use in the example */
+
+#define ESP_ZB_ZED_CONFIG()                             \
+  {                                                     \
+      .esp_zb_role = ESP_ZB_DEVICE_TYPE_ED,             \
+      .install_code_policy = INSTALLCODE_POLICY_ENABLE, \
+      .nwk_cfg = {                                      \
+          .zed_cfg = {                                  \
+              .ed_timeout = ED_AGING_TIMEOUT,           \
+              .keep_alive = ED_KEEP_ALIVE,              \
+          },                                            \
+      },                                                \
+  }
+
+#define ESP_ZB_ZR_CONFIG()                              \
+  {                                                     \
+      .esp_zb_role = ESP_ZB_DEVICE_TYPE_ROUTER,         \
+      .install_code_policy = INSTALLCODE_POLICY_ENABLE, \
+      .nwk_cfg = {                                      \
+          .zczr_cfg = {                                 \
+              .max_children = MAX_CHILDREN,             \
+          },                                            \
+      },                                                \
+  }
 
 #define ESP_ZB_DEFAULT_RADIO_CONFIG() \
   { .radio_mode = ZB_RADIO_MODE_NATIVE, }
@@ -81,7 +109,6 @@ class ZigBeeComponent : public Component {
   std::map<uint8_t, esp_zb_ha_standard_devices_t> endpoint_list;
   std::map<uint8_t, esp_zb_cluster_list_t *> cluster_list;
   std::map<std::tuple<uint8_t, uint16_t, uint8_t>, esp_zb_attribute_list_t *> attribute_list;
-  esp_zb_nwk_device_type_t device_role = ESP_ZB_DEVICE_TYPE_ED;
   esp_zb_ep_list_t *esp_zb_ep_list = esp_zb_ep_list_create();
   esp_zb_attribute_list_t *esp_zb_basic_cluster;
   esp_zb_attribute_list_t *esp_zb_identify_cluster;
