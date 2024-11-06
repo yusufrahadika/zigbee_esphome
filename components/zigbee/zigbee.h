@@ -2,7 +2,6 @@
 
 #include <map>
 #include <tuple>
-#include <stdfloat>
 #include <deque>
 
 #include "esp_zigbee_core.h"
@@ -72,11 +71,11 @@ class ZigBeeComponent : public Component {
  public:
   void setup() override;
   void dump_config() override;
-  void create_endpoint(uint8_t endpoint_id, esp_zb_ha_standard_devices_t device_id);
-  void create_ident_cluster(uint8_t ident_time);
-  void create_basic_cluster(std::string model, std::string manufacturer, std::string date, uint8_t power,
-                            uint8_t app_version, uint8_t stack_version, uint8_t hw_version, std::string area,
-                            uint8_t physical_env);
+  esp_err_t create_endpoint(uint8_t endpoint_id, esp_zb_ha_standard_devices_t device_id);
+  void set_ident_time(uint8_t ident_time);
+  void set_basic_cluster(std::string model, std::string manufacturer, std::string date, uint8_t power,
+                         uint8_t app_version, uint8_t stack_version, uint8_t hw_version, std::string area,
+                         uint8_t physical_env);
   void add_cluster(uint8_t endpoint_id, uint16_t cluster_id, uint8_t role);
   void create_default_cluster(uint8_t endpoint_id, esp_zb_ha_standard_devices_t device_id);
 
@@ -105,13 +104,25 @@ class ZigBeeComponent : public Component {
 
  protected:
   void esp_zb_task();
+  esp_zb_attribute_list_t *create_ident_cluster();
+  esp_zb_attribute_list_t *create_basic_cluster();
   bool connected = false;
   std::map<uint8_t, esp_zb_ha_standard_devices_t> endpoint_list;
   std::map<uint8_t, esp_zb_cluster_list_t *> cluster_list;
   std::map<std::tuple<uint8_t, uint16_t, uint8_t>, esp_zb_attribute_list_t *> attribute_list;
   esp_zb_ep_list_t *esp_zb_ep_list = esp_zb_ep_list_create();
-  esp_zb_attribute_list_t *esp_zb_basic_cluster;
-  esp_zb_attribute_list_t *esp_zb_identify_cluster;
+  struct {
+    std::string model;
+    std::string manufacturer;
+    std::string date;
+    uint8_t power;
+    uint8_t app_version;
+    uint8_t stack_version;
+    uint8_t hw_version;
+    std::string area;
+    uint8_t physical_env;
+  } basic_cluster_data;
+  uint8_t ident_time;
 };
 
 extern "C" void esp_zb_app_signal_handler(esp_zb_app_signal_t *signal_struct);
