@@ -174,7 +174,7 @@ async def to_code(config):
         ref="c5be1da5c349103a85928ed02ca924c0f657b314",
     )
     add_idf_sdkconfig_option("CONFIG_ZB_ENABLED", True)
-    if (config[CONF_POWER_SUPPLY] != 3 and config[CONF_ROUTER]):
+    if config[CONF_POWER_SUPPLY] != 3 and config[CONF_ROUTER]:
         add_idf_sdkconfig_option("CONFIG_ZB_ZCZR", True)
     else:
         add_idf_sdkconfig_option("CONFIG_ZB_ZED", True)
