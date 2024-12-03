@@ -48,6 +48,7 @@ CONF_CLUSTER = "cluster"
 CONF_REPORT = "report"
 CONF_ACCESS = "access"
 CONF_ROUTER = "router"
+CONF_CAPTIVE_PORTAL = "captive_portal"
 
 zigbee_ns = cg.esphome_ns.namespace("zigbee")
 ZigBeeComponent = zigbee_ns.class_("ZigBeeComponent", cg.Component)
@@ -138,7 +139,11 @@ def final_validate(config):
             f"Use '{CONF_PARTITIONS}' in esp32 to specify a custom partition table including zigbee partitions"
         )
     if CONF_WIFI in fv.full_config.get():
-        if CONF_AP in fv.full_config.get()[CONF_WIFI]:
+        if (
+            CONF_AP in fv.full_config.get()[CONF_WIFI]
+            # Temporary suppress error if AP configuration used for fallback
+            and CONF_CAPTIVE_PORTAL not in fv.full_config.get()
+        ):
             raise cv.Invalid("Zigbee can't be used together with an Wifi Access Point.")
 
     return config
