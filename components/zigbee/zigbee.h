@@ -46,14 +46,10 @@ using zb_device_params_t = struct zb_device_params_s {
   ESP_ZB_TRANSCEIVER_ALL_CHANNELS_MASK /* Zigbee primary channel mask use in the example */
 
 #define ESP_ZB_DEFAULT_RADIO_CONFIG() \
-  { \
-      .radio_mode = ZB_RADIO_MODE_NATIVE, \
-  }
+  { .radio_mode = ZB_RADIO_MODE_NATIVE, }
 
 #define ESP_ZB_DEFAULT_HOST_CONFIG() \
-  { \
-      .host_connection_mode = ZB_HOST_CONNECTION_MODE_NONE, \
-  }
+  { .host_connection_mode = ZB_HOST_CONNECTION_MODE_NONE, }
 
 template<class T> T get_value_by_type(uint8_t attr_type, void *data);
 
