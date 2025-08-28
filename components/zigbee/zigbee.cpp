@@ -22,13 +22,26 @@ ZigBeeComponent *zigbeeC;
 
 device_params_t coord;
 
-/********************* Define functions **************************/
-uint8_t *get_character_string(std::string str) {
-  uint8_t *cstr = new uint8_t[(str.size() + 2)];
-  std::snprintf((char *) (cstr + 1), str.size() + 1, "%s", str.c_str());
-  cstr[0] = str.size();
+/**
+ * Creates a ZCL string from the given input string.
+ *
+ * @param str          Pointer to the input null-terminated C-style string.
+ * @param max_size     Maximum allowable size for the resulting ZCL string. Maximum value: 254.
+ * @param use_max_size Optional. If true, the `max_size` is used directly,
+ *                     overriding the actual size of the input string.
+ * @return             Pointer to a dynamically allocated ZCL string.
+ *                     NOTE: Caller is responsible for freeing the allocated memory with `delete[]`.
+ *
+ */
+uint8_t *get_zcl_string(const char *str, uint8_t max_size, bool use_max_size) {
+  uint8_t str_len = static_cast<uint8_t>(strlen(str));
+  uint8_t zcl_str_size = use_max_size ? max_size : std::min(max_size, str_len);
 
-  return cstr;
+  uint8_t *zcl_str = new uint8_t[zcl_str_size + 1];  // string + length octet
+  zcl_str[0] = zcl_str_size;
+  memcpy(zcl_str + 1, str, str_len);
+
+  return zcl_str;
 }
 
 static void bdb_start_top_level_commissioning_cb(uint8_t mode_mask) {
@@ -37,49 +50,13 @@ static void bdb_start_top_level_commissioning_cb(uint8_t mode_mask) {
   }
 }
 
-void ZigBeeComponent::set_report(uint8_t endpoint_id, uint16_t cluster_id, uint8_t role, uint16_t attr_id) {
-  /* Config the reporting info  */
-  esp_zb_zcl_reporting_info_t reporting_info = {
-      .direction = ESP_ZB_ZCL_CMD_DIRECTION_TO_SRV,
-      .ep = endpoint_id,
-      .cluster_id = cluster_id,
-      .cluster_role = role,
-      .attr_id = attr_id,
-      .manuf_code = ESP_ZB_ZCL_ATTR_NON_MANUFACTURER_SPECIFIC,
-  };
-
-  // reporting_info.dst.short_addr = 0;
-  // reporting_info.dst.endpoint = 1;
-  reporting_info.dst.profile_id = ESP_ZB_AF_HA_PROFILE_ID;
-  reporting_info.u.send_info.min_interval = 10;     /*!< Actual minimum reporting interval */
-  reporting_info.u.send_info.max_interval = 0;      /*!< Actual maximum reporting interval */
-  reporting_info.u.send_info.def_min_interval = 10; /*!< Default minimum reporting interval */
-  reporting_info.u.send_info.def_max_interval = 0;  /*!< Default maximum reporting interval */
-  reporting_info.u.send_info.delta.s16 = 0;         /*!< Actual reportable change */
-
-  this->reporting_list.push_back(reporting_info);
+void ZigBeeComponent::set_report(ZigBeeAttribute *attribute, esp_zb_zcl_reporting_info_t reporting_info) {
+  this->reporting_list.push_back(std::make_tuple(attribute, reporting_info));
 }
 
-void ZigBeeComponent::report() { this->report_ = true; }
-
-void ZigBeeComponent::send_report_() {
-  if (esp_zb_lock_acquire(20 / portTICK_PERIOD_MS)) {
-    esp_zb_zcl_report_attr_cmd_t cmd = {
-        .address_mode = ESP_ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-        .direction = ESP_ZB_ZCL_CMD_DIRECTION_TO_CLI,
-    };
-    cmd.zcl_basic_cmd.dst_addr_u.addr_short = 0x0000;
-    cmd.zcl_basic_cmd.dst_endpoint = 1;
-
-    for (auto reporting_info : zigbeeC->reporting_list) {
-      cmd.zcl_basic_cmd.src_endpoint = reporting_info.ep;
-      cmd.clusterID = reporting_info.cluster_id;
-      cmd.attributeID = reporting_info.attr_id;
-      // cmd.cluster_role = reporting_info.cluster_role;
-      esp_zb_zcl_report_attr_cmd_req(&cmd);
-    }
-    this->report_ = false;
-    esp_zb_lock_release();
+void ZigBeeComponent::report() {
+  for (const auto &[attribute, _] : zigbeeC->reporting_list) {
+    attribute->report();
   }
 }
 
@@ -341,11 +318,11 @@ esp_zb_attribute_list_t *ZigBeeComponent::create_basic_cluster_() {
   ESP_LOGD(TAG, "Manufacturer: %s", this->basic_cluster_data_.manufacturer.c_str());
   ESP_LOGD(TAG, "Date: %s", this->basic_cluster_data_.date.c_str());
   ESP_LOGD(TAG, "Area: %s", this->basic_cluster_data_.area.c_str());
-  uint8_t *ManufacturerName =
-      get_character_string(this->basic_cluster_data_.manufacturer);  // warning: this is in format {length, 'string'} :
-  uint8_t *ModelIdentifier = get_character_string(this->basic_cluster_data_.model);
-  uint8_t *DateCode = get_character_string(this->basic_cluster_data_.date);
-  uint8_t *Location = get_character_string(this->basic_cluster_data_.area);
+  uint8_t *ManufacturerName = get_zcl_string(this->basic_cluster_data_.manufacturer.c_str(),
+                                             32);  // warning: this is in format {length, 'string'} :
+  uint8_t *ModelIdentifier = get_zcl_string(this->basic_cluster_data_.model.c_str(), 32);
+  uint8_t *DateCode = get_zcl_string(this->basic_cluster_data_.date.c_str(), 16);
+  uint8_t *Location = get_zcl_string(this->basic_cluster_data_.area.c_str(), 16);
   esp_zb_attribute_list_t *attr_list = esp_zb_basic_cluster_create(&basic_cluster_cfg);
   esp_zb_basic_cluster_add_attr(attr_list, ESP_ZB_ZCL_ATTR_BASIC_APPLICATION_VERSION_ID,
                                 &(this->basic_cluster_data_.app_version));
@@ -359,6 +336,10 @@ esp_zb_attribute_list_t *ZigBeeComponent::create_basic_cluster_() {
   esp_zb_basic_cluster_add_attr(attr_list, ESP_ZB_ZCL_ATTR_BASIC_LOCATION_DESCRIPTION_ID, Location);
   esp_zb_basic_cluster_add_attr(attr_list, ESP_ZB_ZCL_ATTR_BASIC_PHYSICAL_ENVIRONMENT_ID,
                                 &(this->basic_cluster_data_.physical_env));
+  delete[] ManufacturerName;
+  delete[] ModelIdentifier;
+  delete[] DateCode;
+  delete[] Location;
   return attr_list;
 }
 
@@ -392,6 +373,13 @@ static void esp_zb_task_(void *pvParameters) {
     vTaskDelete(NULL);
   }
 
+  if ((zigbeeC->device_role_ == ESP_ZB_DEVICE_TYPE_ED) && (zigbeeC->basic_cluster_data_.power == 0x03)) {
+    ESP_LOGD(TAG, "Battery powered!");
+    // zb_set_ed_node_descriptor(0, 1, 1);  // workaround, rx_on_when_idle should be 0 for battery powered devices.
+    esp_zb_set_node_descriptor_power_source(0);
+  } else {
+    esp_zb_set_node_descriptor_power_source(1);
+  }
   esp_zb_stack_main_loop();
 }
 
@@ -468,29 +456,14 @@ void ZigBeeComponent::setup() {
   }
 
   // reporting
-  for (auto reporting_info : this->reporting_list) {
+  for (auto &[_, reporting_info] : this->reporting_list) {
     ESP_LOGD(TAG, "set reporting for cluster: %u", reporting_info.cluster_id);
-    esp_zb_zcl_attr_location_info_t attr_info = {
-        .endpoint_id = reporting_info.ep,
-        .cluster_id = reporting_info.cluster_id,
-        .cluster_role = reporting_info.cluster_role,
-        .manuf_code = reporting_info.manuf_code,
-        .attr_id = reporting_info.attr_id,
-    };
     if (esp_zb_zcl_update_reporting_info(&reporting_info) != ESP_OK) {
       ESP_LOGE(TAG, "Could not configure reporting for attribute 0x%04X in cluster 0x%04X in endpoint %u",
                reporting_info.attr_id, reporting_info.cluster_id, reporting_info.ep);
     }
-    // ESP_ERROR_CHECK(esp_zb_zcl_start_attr_reporting(attr_info));  // is this needed?
   }
-
   xTaskCreate(esp_zb_task_, "Zigbee_main", 4096, NULL, 24, NULL);
-}
-
-void ZigBeeComponent::loop() {
-  if (this->report_) {
-    this->send_report_();
-  }
 }
 
 void ZigBeeComponent::dump_config() {
