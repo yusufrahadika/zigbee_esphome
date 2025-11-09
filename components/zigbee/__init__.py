@@ -40,6 +40,7 @@ from .const import (
     CONF_AS_GENERIC,
     CONF_ATTRIBUTE_ID,
     CONF_ATTRIBUTES,
+    CONF_CAPTIVE_PORTAL,
     CONF_CLUSTERS,
     CONF_DEVICE_TYPE,
     CONF_ENDPOINTS,
@@ -172,7 +173,11 @@ def final_validate(config):
             f"Use '{CONF_PARTITIONS}' in esp32 to specify a custom partition table including zigbee partitions"
         )
     if CONF_WIFI in fv.full_config.get():
-        if CONF_AP in fv.full_config.get()[CONF_WIFI]:
+        if (
+            CONF_AP in fv.full_config.get()[CONF_WIFI]
+            # Temporary suppress error if AP configuration used for fallback
+            and CONF_CAPTIVE_PORTAL not in fv.full_config.get()
+        ):
             raise cv.Invalid("Zigbee can't be used together with an Wifi Access Point.")
     global comp_ids  # noqa: PLW0603
     comp_ids = len(CORE.component_ids)
